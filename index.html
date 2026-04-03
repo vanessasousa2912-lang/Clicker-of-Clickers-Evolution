@@ -16,6 +16,7 @@
             touch-action: manipulation;
         }
     
+        /* Animação de clique corrigida */
         .click-active { transform: scale(0.95) !important; transition: transform 0.05s; }
         
         .particle { position: absolute; pointer-events: none; animation: float-up 0.8s ease-out forwards; z-index: 100; font-weight: bold; }
@@ -27,6 +28,7 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
+        /* Bloqueia interferência interna */
         .upgrade-card * { pointer-events: none; }
         
         .disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); pointer-events: none !important; }
@@ -44,8 +46,6 @@
 
         .tab-active { border-bottom: 3px solid #3b82f6; color: white; }
         .super-gradient { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); }
-
-        .backup-item:hover { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.4); }
     </style>
 </head>
 <body class="text-white">
@@ -61,26 +61,12 @@
             <input type="text" id="avatar-input" placeholder="URL da foto ou Emoji..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-center outline-none">
             
             <div class="flex gap-2 mb-6 justify-center">
-                <button type="button" onpointerdown="setLang('pt')" class="px-3 py-1 bg-slate-700 rounded-lg text-sm border hover:border-blue-500 transition" id="btn-pt">PT</button>
-                <button type="button" onpointerdown="setLang('en')" class="px-3 py-1 bg-slate-700 rounded-lg text-sm border hover:border-blue-500 transition" id="btn-en">EN</button>
-                <button type="button" onpointerdown="setLang('es')" class="px-3 py-1 bg-slate-700 rounded-lg text-sm border hover:border-blue-500 transition" id="btn-es">ES</button>
+                <button onpointerdown="setLang('pt')" class="px-3 py-1 bg-slate-700 rounded-lg text-sm border hover:border-blue-500 transition" id="btn-pt">PT</button>
+                <button onpointerdown="setLang('en')" class="px-3 py-1 bg-slate-700 rounded-lg text-sm border hover:border-blue-500 transition" id="btn-en">EN</button>
+                <button onpointerdown="setLang('es')" class="px-3 py-1 bg-slate-700 rounded-lg text-sm border hover:border-blue-500 transition" id="btn-es">ES</button>
             </div>
 
-            <button type="button" onpointerdown="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold uppercase transition" id="t-start-btn">Começar Jogo</button>
-        </div>
-    </div>
-
-    <!-- Backup Modal -->
-    <div id="backup-modal" class="fixed inset-0 z-[120] modal-bg flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-800 p-6 rounded-3xl w-full max-w-lg border border-slate-700 shadow-2xl flex flex-col max-h-[80vh]">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black uppercase tracking-tighter" id="t-backup-title">Backups Recentes</h2>
-                <button type="button" onpointerdown="closeBackupModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
-            </div>
-            <div id="backup-list" class="space-y-3 overflow-y-auto pr-2 custom-scrollbar">
-                <!-- Itens de backup injetados via JS -->
-            </div>
-            <p class="text-[10px] text-slate-500 mt-4 text-center uppercase tracking-widest" id="t-backup-footer">Backups automáticos a cada 5 minutos (Máx 20)</p>
+            <button onpointerdown="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold uppercase transition" id="t-start-btn">Começar Jogo</button>
         </div>
     </div>
 
@@ -100,24 +86,20 @@
                 <p class="text-[10px] text-blue-300 uppercase font-bold" id="t-prestige-label">Prestígio Normal</p>
                 <p id="prestige-val" class="text-2xl font-black text-blue-400">0</p>
                 <p id="prestige-mult-display" class="text-[10px] text-blue-300/60 mt-1">Bônus: x1.0</p>
-                <button type="button" onpointerdown="openPrestigeModal()" class="mt-3 w-full bg-blue-600/40 hover:bg-blue-600 p-2 rounded-lg text-xs font-bold transition uppercase" id="t-prestige-btn">Prestigiar</button>
+                <button onpointerdown="openPrestigeModal()" class="mt-3 w-full bg-blue-600/40 hover:bg-blue-600 p-2 rounded-lg text-xs font-bold transition uppercase" id="t-prestige-btn">Prestigiar</button>
             </div>
 
             <div id="super-prestige-card" class="super-gradient p-4 rounded-2xl border border-white/20 shadow-lg">
                 <p class="text-[10px] text-white uppercase font-bold" id="t-super-label">Prestígio Total</p>
                 <p id="super-prestige-val" class="text-2xl font-black text-white">0</p>
                 <p id="super-mult-display" class="text-[10px] text-white/80 mt-1">Mult. Global: x1.0</p>
-                <button type="button" onpointerdown="doSuperPrestige()" id="super-prestige-btn" class="mt-3 w-full bg-white/20 hover:bg-white/40 p-2 rounded-lg text-xs font-bold transition uppercase disabled">Super Prestígio</button>
+                <button onpointerdown="doSuperPrestige()" id="super-prestige-btn" class="mt-3 w-full bg-white/20 hover:bg-white/40 p-2 rounded-lg text-xs font-bold transition uppercase disabled">Super Prestígio</button>
                 <p id="super-req" class="text-[9px] text-white/60 mt-2 text-center italic">Requer Mult. x50</p>
             </div>
 
-            <button type="button" onpointerdown="openBackupModal()" class="w-full bg-slate-800 hover:bg-slate-700 p-3 rounded-xl text-xs font-bold transition uppercase border border-white/5 flex items-center justify-center gap-2">
-                <span>💾</span> <span id="t-backup-btn-label">Backups de Dados</span>
-            </button>
-
             <div class="mt-auto space-y-2">
-                <button type="button" onpointerdown="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-xs text-slate-500 hover:text-white transition" id="t-edit-profile">Editar Perfil</button>
-                <button type="button" onpointerdown="resetGame(true)" class="w-full text-xs text-red-900 hover:text-red-500 transition" id="t-reset-btn">Resetar Tudo</button>
+                <button onpointerdown="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-xs text-slate-500 hover:text-white transition" id="t-edit-profile">Editar Perfil</button>
+                <button onpointerdown="resetGame(true)" class="w-full text-xs text-red-900 hover:text-red-500 transition" id="t-reset-btn">Resetar Tudo</button>
             </div>
         </div>
 
@@ -128,7 +110,7 @@
                 <p class="text-blue-400 mt-2 text-lg font-medium"><span id="pps-display">0</span> <span id="t-unit">PONTOS / SEG</span></p>
             </div>
 
-            <button id="main-clicker" type="button" class="relative group w-48 h-48 md:w-64 md:h-64 rounded-full border-[12px] border-slate-800 shadow-2xl transition-all flex items-center justify-center bg-slate-900 hover:bg-slate-800 overflow-hidden">
+            <button id="main-clicker" class="relative group w-48 h-48 md:w-64 md:h-64 rounded-full border-[12px] border-slate-800 shadow-2xl transition-all flex items-center justify-center bg-slate-900 hover:bg-slate-800 overflow-hidden">
                 <div class="absolute inset-0 bg-blue-600/10 group-hover:bg-blue-600/20 pointer-events-none"></div>
                 <div class="flex flex-col items-center relative z-10 pointer-events-none">
                     <span id="click-text" class="font-black text-3xl text-white">+1</span>
@@ -144,8 +126,8 @@
         <!-- Upgrades Panel -->
         <div class="w-full lg:w-[400px] bg-slate-900/80 border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col lg:h-full">
             <div class="flex border-b border-white/10 shrink-0">
-                <button type="button" onpointerdown="setTab('normal')" id="tab-normal" class="flex-1 p-4 font-bold text-sm uppercase tracking-wider tab-active">Normal</button>
-                <button type="button" onpointerdown="setTab('elite')" id="tab-elite" class="flex-1 p-4 font-bold text-sm uppercase tracking-wider text-slate-500 hidden">Elite & Super</button>
+                <button onpointerdown="setTab('normal')" id="tab-normal" class="flex-1 p-4 font-bold text-sm uppercase tracking-wider tab-active">Normal</button>
+                <button onpointerdown="setTab('elite')" id="tab-elite" class="flex-1 p-4 font-bold text-sm uppercase tracking-wider text-slate-500 hidden">Elite & Super</button>
             </div>
             <div id="upgrades-container" class="p-6 flex flex-col gap-3 overflow-y-auto scrollable-area flex-1"></div>
         </div>
@@ -162,8 +144,8 @@
                 <div><p class="text-xs text-slate-500 uppercase" id="t-pres-new">Novo</p><p id="pres-new-val" class="text-2xl font-bold text-blue-400">x2.0</p></div>
             </div>
             <div class="flex gap-4">
-                <button type="button" onpointerdown="closePrestigeModal()" class="flex-1 bg-slate-700 p-4 rounded-xl font-bold" id="t-cancel">Cancelar</button>
-                <button type="button" id="confirm-prestige-btn" onpointerdown="doPrestige()" class="flex-1 bg-blue-600 p-4 rounded-xl font-bold disabled" id="t-confirm">Confirmar</button>
+                <button onpointerdown="closePrestigeModal()" class="flex-1 bg-slate-700 p-4 rounded-xl font-bold" id="t-cancel">Cancelar</button>
+                <button id="confirm-prestige-btn" onpointerdown="doPrestige()" class="flex-1 bg-blue-600 p-4 rounded-xl font-bold disabled" id="t-confirm">Confirmar</button>
             </div>
         </div>
     </div>
@@ -177,16 +159,6 @@
                 statClickers: "Clickers", statPower: "Força", presTitle: "Ascensão",
                 presDesc: "Reseta pontos e clickers por um bônus PERMANENTE.", presCurr: "Atual",
                 presNew: "Novo", cancel: "Cancelar", confirm: "Confirmar",
-                backupTitle: "Backups Recentes", backupBtnLabel: "Backups de Dados",
-                backupFooter: "Backups automáticos a cada 5 minutos (Máx 20)",
-                backupEmpty: "Nenhum backup disponível ainda...",
-                superReq: "Requer Mult. x50",
-                superReady: "PRONTO!",
-                placeholderName: "Seu nome...",
-                placeholderAvatar: "URL da foto ou Emoji...",
-                secNormal: "Melhorias",
-                secElite: "Elite",
-                secSuper: "SUPER (Permanente)",
                 upgrades: {
                     normal: [
                         ["Overclock", "Aumenta a força dos clickers."], ["Sincronia Lunar", "Cliques manuais rendem mais."],
@@ -214,16 +186,6 @@
                 statClickers: "Clickers", statPower: "Power", presTitle: "Ascension",
                 presDesc: "Reset points and clickers for a PERMANENT bonus.", presCurr: "Current",
                 presNew: "New", cancel: "Cancel", confirm: "Confirm",
-                backupTitle: "Recent Backups", backupBtnLabel: "Data Backups",
-                backupFooter: "Auto-backups every 5 minutes (Max 20)",
-                backupEmpty: "No backups available yet...",
-                superReq: "Requires x50 Mult.",
-                superReady: "READY!",
-                placeholderName: "Your name...",
-                placeholderAvatar: "Photo URL or Emoji...",
-                secNormal: "Upgrades",
-                secElite: "Elite",
-                secSuper: "SUPER (Permanent)",
                 upgrades: {
                     normal: [
                         ["Overclock", "Increase clicker strength."], ["Moon Sync", "Manual clicks yield more."],
@@ -251,19 +213,9 @@
                 statClickers: "Clickers", statPower: "Fuerza", presTitle: "Ascensión",
                 presDesc: "Reinicia puntos y clickers por un bono PERMANENTE.", presCurr: "Actual",
                 presNew: "Nuevo", cancel: "Cancelar", confirm: "Confirmar",
-                backupTitle: "Copias Recientes", backupBtnLabel: "Copias de Seguridad",
-                backupFooter: "Copias automáticas cada 5 min (Máx 20)",
-                backupEmpty: "No hay copias disponibles aún...",
-                superReq: "Requiere Mult. x50",
-                superReady: "¡LISTO!",
-                placeholderName: "Tu nombre...",
-                placeholderAvatar: "URL de foto o Emoji...",
-                secNormal: "Mejoras",
-                secElite: "Elite",
-                secSuper: "SÚPER (Permanente)",
                 upgrades: {
                     normal: [
-                        ["Overclock", "Mejora força de clickers."], ["Sincronía Lunar", "Clicks rinden más."],
+                        ["Overclock", "Mejora fuerza de clickers."], ["Sincronía Lunar", "Clicks rinden más."],
                         ["Fábrica", "Genera clickers auto."], ["Chip de Silicio", "Bono producción +10%."],
                         ["Crítico Cuántico", "Probabilidad 10x."], ["Energía Solar", "Producción pasiva."],
                         ["Nanotecnología", "Clickers 20% baratos."], ["IA Avanzada", "Auto-clicker."],
@@ -307,65 +259,55 @@
             upgrades: new Array(10).fill(0),
             eliteUpgrades: new Array(5).fill(0),
             superUpgrades: new Array(5).fill(0),
-            activeTab: 'normal', lastTick: Date.now(),
-            lastBackup: Date.now()
+            activeTab: 'normal', lastTick: Date.now()
         };
 
-        let backups = [];
-
         function setLang(l) {
-            state.lang = l || 'pt';
+            state.lang = l;
             ['pt', 'en', 'es'].forEach(btn => {
                 const b = document.getElementById(`btn-${btn}`);
-                if (b) b.classList.toggle('border-blue-500', btn === state.lang);
+                if (b) b.classList.toggle('border-blue-500', btn === l);
             });
             translateUI();
         }
 
         function translateUI() {
-            const t = i18n[state.lang] || i18n.pt;
+            const t = i18n[state.lang];
             const map = {
                 't-login-title': 'loginTitle', 't-start-btn': 'startBtn', 't-rank': 'rank',
                 't-prestige-label': 'prestigeLabel', 't-prestige-btn': 'prestigeBtn', 't-super-label': 'superLabel',
                 't-edit-profile': 'editProfile', 't-reset-btn': 'resetBtn', 't-unit': 'unit',
                 't-stat-clickers': 'statClickers', 't-stat-power': 'statPower', 't-pres-title': 'presTitle',
                 't-pres-desc': 'presDesc', 't-pres-curr': 'presCurr', 't-pres-new': 'presNew',
-                't-cancel': 'cancel', 't-confirm': 'confirm', 't-backup-title': 'backupTitle',
-                't-backup-btn-label': 'backupBtnLabel', 't-backup-footer': 'backupFooter'
+                't-cancel': 'cancel', 't-confirm': 'confirm'
             };
             for(let id in map) {
                 const el = document.getElementById(id);
                 if(el) el.innerText = t[map[id]];
             }
-
-            document.getElementById('username-input').placeholder = t.placeholderName;
-            document.getElementById('avatar-input').placeholder = t.placeholderAvatar;
-
-            updateUI();
+            renderUpgrades();
         }
 
         function saveProfile() {
-            const nameInput = document.getElementById('username-input');
-            const avatarInput = document.getElementById('avatar-input');
-            if(nameInput.value) state.username = nameInput.value;
-            if(avatarInput.value) state.avatar = avatarInput.value;
+            const name = document.getElementById('username-input').value;
+            const avatar = document.getElementById('avatar-input').value;
+            if(name) state.username = name;
+            if(avatar) state.avatar = avatar;
             
             document.getElementById('user-name').innerText = state.username;
-            updateAvatarDisplay();
+            const avDiv = document.getElementById('user-avatar');
+            
+            const renderAvatar = (div, val) => {
+                if(val.startsWith('http')) {
+                    div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`;
+                } else {
+                    div.innerText = val || "👤";
+                }
+            };
+
+            renderAvatar(avDiv, state.avatar);
             document.getElementById('login-modal').classList.add('hidden');
             saveGame();
-        }
-
-        function updateAvatarDisplay(divId = 'user-avatar', val = state.avatar) {
-            const avDiv = document.getElementById(divId);
-            if(!avDiv) return;
-            const value = val || "👤";
-            if(value.startsWith('http')) {
-                avDiv.innerHTML = `<img src="${value}" class="w-full h-full object-cover">`;
-            } else {
-                avDiv.innerHTML = "";
-                avDiv.innerText = value;
-            }
         }
 
         function setTab(tab) {
@@ -377,17 +319,17 @@
             renderUpgrades();
         }
 
+        // renderUpgrades agora cria o HTML base (chamado na inicialização, ao comprar e trocar de aba)
         function renderUpgrades() {
             const container = document.getElementById('upgrades-container');
-            if (!container) return;
             container.innerHTML = '';
-            const t = i18n[state.lang] || i18n.pt;
+            const t = i18n[state.lang].upgrades;
 
             if(state.activeTab === 'normal') {
-                renderSection(t.secNormal, upgradeData.normal, state.upgrades, t.upgrades.normal, 'n');
+                renderSection("Melhorias", upgradeData.normal, state.upgrades, t.normal, 'n');
             } else {
-                renderSection(t.secElite, upgradeData.elite, state.eliteUpgrades, t.upgrades.elite, 'e');
-                renderSection(t.secSuper, upgradeData.super, state.superUpgrades, t.upgrades.super, 's', true);
+                renderSection("Elite", upgradeData.elite, state.eliteUpgrades, t.elite, 'e');
+                renderSection("SUPER (Permanente)", upgradeData.super, state.superUpgrades, t.super, 's', true);
             }
         }
 
@@ -403,8 +345,13 @@
                 const card = document.createElement('div');
                 const canAfford = state.score >= cost;
                 
-                card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 ${!canAfford ? 'disabled' : 'bg-slate-800/50 border-white/5 shadow-sm hover:border-blue-500/50'}`;
-                if(isSuper) card.classList.add('border-purple-500/20', 'bg-purple-900/10');
+                // Setamos a classe base e o atributo data-cost para atualizar via updateUI() dinamicamente sem recriar DOM
+                if(isSuper) {
+                    card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 bg-purple-900/10 border-purple-500/20 shadow-sm hover:border-purple-500/50 ${!canAfford ? 'disabled' : ''}`;
+                } else {
+                    card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 bg-slate-800/50 border-white/5 shadow-sm hover:border-blue-500/50 ${!canAfford ? 'disabled' : ''}`;
+                }
+                card.setAttribute('data-cost', cost);
                 
                 card.innerHTML = `
                     <div class="flex-1 pr-2">
@@ -434,98 +381,97 @@
             if(type === 'n') state.upgrades[i]++;
             else if(type === 'e') state.eliteUpgrades[i]++;
             else if(type === 's') state.superUpgrades[i]++;
+            renderUpgrades(); // Re-renderiza para atualizar custo e nível após a compra
             updateUI();
             saveGame();
         }
 
         function formatNum(n) {
-            const num = Number(n) || 0;
-            if (num >= 1e15) return (num/1e15).toFixed(2) + 'Q';
-            if (num >= 1e12) return (num/1e12).toFixed(2) + 'T';
-            if (num >= 1e9) return (num/1e9).toFixed(2) + 'B';
-            if (num >= 1e6) return (num/1e6).toFixed(2) + 'M';
-            if (num >= 1e3) return (num/1e3).toFixed(1) + 'K';
-            return Math.floor(num);
+            if (n >= 1e15) return (n/1e15).toFixed(2) + 'Q';
+            if (n >= 1e12) return (n/1e12).toFixed(2) + 'T';
+            if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+            if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+            return Math.floor(n);
         }
 
         function calculatePPS() {
-            let basePower = 1 + (state.upgrades[0] || 0) + ((state.eliteUpgrades[1] || 0) * 5);
-            let pps = ((state.totalClickers || 0) * basePower);
-            pps *= (1 + ((state.upgrades[3] || 0) * 0.1));
-            pps *= (1 + ((state.eliteUpgrades[4] || 0) * 2)); 
-            return pps * (state.prestigeMultiplier || 1.0) * (state.superMultiplier || 1.0);
+            let basePower = 1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5);
+            let pps = (state.totalClickers * basePower);
+            pps *= (1 + (state.upgrades[3] * 0.1));
+            pps *= (1 + (state.eliteUpgrades[4] * 2)); 
+            return pps * state.prestigeMultiplier * state.superMultiplier;
         }
 
+        // updateUI não recria mais a DOM dos cards. Apenas atualiza a classe para performance.
         function updateUI() {
             const pps = calculatePPS();
-            const t = i18n[state.lang] || i18n.pt;
-            
-            // Garantir que os multiplicadores nunca sejam nulos para o toFixed
-            const pMult = Number(state.prestigeMultiplier) || 1.0;
-            const sMult = Number(state.superMultiplier) || 1.0;
-
             document.getElementById('score-display').innerText = formatNum(state.score);
             document.getElementById('pps-display').innerText = formatNum(pps);
             document.getElementById('stat-count').innerText = formatNum(state.totalClickers);
-            document.getElementById('stat-power').innerText = formatNum(1 + (state.upgrades[0] || 0) + ((state.eliteUpgrades[1] || 0) * 5));
-            document.getElementById('prestige-val').innerText = state.prestige || 0;
-            document.getElementById('prestige-mult-display').innerText = `Bônus: x${pMult.toFixed(1)}`;
-            document.getElementById('super-prestige-val').innerText = state.superPrestige || 0;
-            document.getElementById('super-mult-display').innerText = `Mult. Global: x${sMult.toFixed(1)}`;
+            document.getElementById('stat-power').innerText = formatNum(1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5));
+            document.getElementById('prestige-val').innerText = state.prestige;
+            document.getElementById('prestige-mult-display').innerText = `Bônus: x${state.prestigeMultiplier.toFixed(1)}`;
+            document.getElementById('super-prestige-val').innerText = state.superPrestige;
+            document.getElementById('super-mult-display').innerText = `Mult. Global: x${state.superMultiplier.toFixed(1)}`;
 
             const sBtn = document.getElementById('super-prestige-btn');
-            const sReq = document.getElementById('super-req');
-            if(pMult >= 50) {
-                if(sBtn) sBtn.classList.remove('disabled', 'opacity-50');
-                if(sReq) sReq.innerText = t.superReady;
+            if(state.prestigeMultiplier >= 50) {
+                sBtn.classList.remove('disabled', 'opacity-50');
+                document.getElementById('super-req').innerText = "PRONTO!";
             } else {
-                if(sBtn) sBtn.classList.add('disabled', 'opacity-50');
-                if(sReq) sReq.innerText = t.superReq;
+                sBtn.classList.add('disabled', 'opacity-50');
+                document.getElementById('super-req').innerText = "Requer Mult. x50";
             }
 
-            if((state.prestige || 0) > 0 || (state.superPrestige || 0) > 0) {
-                const eTab = document.getElementById('tab-elite');
-                if(eTab) eTab.classList.remove('hidden');
+            if(state.prestige > 0 || state.superPrestige > 0) {
+                document.getElementById('tab-elite').classList.remove('hidden');
             }
-            renderUpgrades();
+
+            // Atualiza o estado de "poder comprar" nos cards que já estão renderizados
+            document.querySelectorAll('.upgrade-card').forEach(card => {
+                const cost = parseFloat(card.getAttribute('data-cost'));
+                if(state.score >= cost) {
+                    card.classList.remove('disabled');
+                } else {
+                    card.classList.add('disabled');
+                }
+            });
         }
 
         function openPrestigeModal() {
-            const pMult = Number(state.prestigeMultiplier) || 1.0;
-            document.getElementById('pres-curr-val').innerText = `x${pMult.toFixed(1)}`;
-            const newMult = pMult + (state.score / 1000000);
+            document.getElementById('pres-curr-val').innerText = `x${state.prestigeMultiplier.toFixed(1)}`;
+            const newMult = state.prestigeMultiplier + (state.score / 1000000);
             document.getElementById('pres-new-val').innerText = `x${newMult.toFixed(1)}`;
             const canPrestige = state.score >= 1000000;
             document.getElementById('confirm-prestige-btn').classList.toggle('disabled', !canPrestige);
             document.getElementById('prestige-modal').classList.remove('hidden');
         }
 
-        function closePrestigeModal() { 
-            const el = document.getElementById('prestige-modal');
-            if(el) el.classList.add('hidden'); 
-        }
+        function closePrestigeModal() { document.getElementById('prestige-modal').classList.add('hidden'); }
 
         function doPrestige() {
             if(state.score < 1000000) return;
-            state.prestigeMultiplier = (Number(state.prestigeMultiplier) || 1.0) + (state.score / 1000000);
-            state.prestige = (state.prestige || 0) + 1;
+            state.prestigeMultiplier += (state.score / 1000000);
+            state.prestige++;
             state.score = 0; state.totalClickers = 0;
             state.upgrades = new Array(10).fill(0);
             state.eliteUpgrades = new Array(5).fill(0);
             closePrestigeModal();
+            renderUpgrades();
             updateUI();
             saveGame();
         }
 
         function doSuperPrestige() {
-            const pMult = Number(state.prestigeMultiplier) || 1.0;
-            if(pMult < 50) return;
-            state.superMultiplier = (Number(state.superMultiplier) || 1.0) + (pMult / 10);
-            state.superPrestige = (state.superPrestige || 0) + 1;
+            if(state.prestigeMultiplier < 50) return;
+            state.superMultiplier += (state.prestigeMultiplier / 10);
+            state.superPrestige++;
             state.score = 0; state.totalClickers = 0;
             state.prestigeMultiplier = 1.0; state.prestige = 0;
             state.upgrades = new Array(10).fill(0);
             state.eliteUpgrades = new Array(5).fill(0);
+            renderUpgrades();
             updateUI();
             saveGame();
         }
@@ -535,8 +481,8 @@
             const btn = document.getElementById('main-clicker');
             btn.classList.add('click-active');
             
-            const gain = (1 + (state.upgrades[1] || 0) + ((state.superUpgrades[1] || 0) * 10)) * (state.superMultiplier || 1.0);
-            state.totalClickers = (state.totalClickers || 0) + gain;
+            const gain = (1 + state.upgrades[1] + (state.superUpgrades[1] * 10)) * state.superMultiplier;
+            state.totalClickers += gain;
             
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
@@ -556,109 +502,35 @@
             setTimeout(() => p.remove(), 800);
         }
 
-        function openBackupModal() {
-            const list = document.getElementById('backup-list');
-            const t = i18n[state.lang] || i18n.pt;
-            if(!list) return;
-            list.innerHTML = "";
-            
-            if(backups.length === 0) {
-                list.innerHTML = `<p class="text-slate-500 text-center py-8">${t.backupEmpty}</p>`;
-            } else {
-                const sorted = [...backups].sort((a,b) => b.timestamp - a.timestamp);
-                sorted.forEach((b, idx) => {
-                    const item = document.createElement('div');
-                    item.className = "backup-item p-4 rounded-2xl border border-slate-700 flex items-center gap-4 transition cursor-pointer";
-                    const date = new Date(b.timestamp).toLocaleTimeString();
-                    const day = new Date(b.timestamp).toLocaleDateString();
-                    item.innerHTML = `
-                        <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden shrink-0" id="av-back-${idx}">👤</div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-bold text-sm truncate">${b.username || "Jogador"}</p>
-                            <p class="text-[10px] text-slate-400">${day} às ${date}</p>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <p class="text-xs font-black text-blue-400">${formatNum(b.score)} pts</p>
-                            <p class="text-[9px] text-slate-500 uppercase">Mult: x${(b.prestigeMultiplier || 1.0).toFixed(1)}</p>
-                        </div>
-                    `;
-                    item.onpointerdown = () => restoreBackup(b.timestamp);
-                    list.appendChild(item);
-                    updateAvatarDisplay(`av-back-${idx}`, b.avatar);
-                });
-            }
-            document.getElementById('backup-modal').classList.remove('hidden');
-        }
-
-        function closeBackupModal() {
-            const el = document.getElementById('backup-modal');
-            if(el) el.classList.add('hidden');
-        }
-
-        function createBackup() {
-            const newBackup = JSON.parse(JSON.stringify({
-                timestamp: Date.now(),
-                username: state.username,
-                avatar: state.avatar,
-                score: state.score,
-                totalClickers: state.totalClickers,
-                prestige: state.prestige,
-                prestigeMultiplier: state.prestigeMultiplier,
-                superPrestige: state.superPrestige,
-                superMultiplier: state.superMultiplier,
-                upgrades: [...state.upgrades],
-                eliteUpgrades: [...state.eliteUpgrades],
-                superUpgrades: [...state.superUpgrades]
-            }));
-            
-            backups.unshift(newBackup);
-            if(backups.length > 20) backups.pop();
-            localStorage.setItem('clicker_evo_backups_luis', JSON.stringify(backups));
-            state.lastBackup = Date.now();
-        }
-
-        function restoreBackup(timestamp) {
-            const b = backups.find(x => x.timestamp === timestamp);
-            if(!b) return;
-            if(confirm("Deseja restaurar este salvamento? O progresso atual será perdido.")) {
-                state = { ...state, ...JSON.parse(JSON.stringify(b)) };
-                state.lastTick = Date.now();
-                state.lastBackup = Date.now();
-                document.getElementById('user-name').innerText = state.username;
-                updateAvatarDisplay();
-                translateUI();
-                closeBackupModal();
-                saveGame();
-            }
-        }
-
-        function saveGame() { 
-            localStorage.setItem('clicker_evo_v4_luis', JSON.stringify(state)); 
-        }
+        function saveGame() { localStorage.setItem('clicker_evo_v4_luis', JSON.stringify(state)); }
 
         function loadGame() {
-            try {
-                const saved = localStorage.getItem('clicker_evo_v4_luis');
-                if(saved) {
-                    const parsed = JSON.parse(saved);
-                    state = { ...state, ...parsed };
-                    document.getElementById('user-name').innerText = state.username;
-                    updateAvatarDisplay();
-                }
-                const savedBackups = localStorage.getItem('clicker_evo_backups_luis');
-                if(savedBackups) {
-                    backups = JSON.parse(savedBackups);
-                }
-            } catch(e) {
-                console.error("Erro ao carregar dados", e);
+            const saved = localStorage.getItem('clicker_evo_v4_luis');
+            if(saved) {
+                state = { ...state, ...JSON.parse(saved) };
+                // Oculta a janela de início se você já tem jogo salvo!
+                document.getElementById('login-modal').classList.add('hidden');
             }
+            
+            document.getElementById('user-name').innerText = state.username;
+            
+            // Esta função inicializa os Upgrades de vez na tela (tinha faltado puxar na ausência do save)
             setLang(state.lang);
+            
+            const avDiv = document.getElementById('user-avatar');
+            const renderAvatar = (div, val) => {
+                if(val && val.startsWith('http')) {
+                    div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`;
+                } else {
+                    div.innerText = val || "👤";
+                }
+            };
+            renderAvatar(avDiv, state.avatar);
         }
 
         function resetGame(full) {
             if(confirm("Deseja resetar todo o seu progresso?")) {
                 localStorage.removeItem('clicker_evo_v4_luis');
-                localStorage.removeItem('clicker_evo_backups_luis');
                 location.reload();
             }
         }
@@ -666,19 +538,14 @@
         window.onload = () => {
             loadGame();
             const clicker = document.getElementById('main-clicker');
-            if(clicker) clicker.onpointerdown = handleMainClick;
+            clicker.onpointerdown = handleMainClick;
             
             setInterval(() => {
                 const now = Date.now();
                 const dt = (now - state.lastTick) / 1000;
                 state.lastTick = now;
-                
                 state.score += calculatePPS() * dt;
-                state.totalClickers += ((state.upgrades[2] || 0) * 0.1 + (state.eliteUpgrades[0] || 0) * 10) * dt;
-                
-                if(now - state.lastBackup >= 300000) {
-                    createBackup();
-                }
+                state.totalClickers += (state.upgrades[2] * 0.1 + state.eliteUpgrades[0] * 10) * dt;
                 updateUI();
             }, 100);
         };
