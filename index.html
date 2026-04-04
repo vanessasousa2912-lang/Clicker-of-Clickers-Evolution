@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clicker of Clickers - Evolution</title>
+    <title>Clicker of Clickers!</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -16,7 +16,6 @@
             touch-action: manipulation;
         }
     
-        /* Animação de clique corrigida */
         .click-active { transform: scale(0.95) !important; transition: transform 0.05s; }
         
         .particle { position: absolute; pointer-events: none; animation: float-up 0.8s ease-out forwards; z-index: 100; font-weight: bold; }
@@ -28,7 +27,6 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
-        /* Bloqueia interferência interna */
         .upgrade-card * { pointer-events: none; }
         
         .disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); pointer-events: none !important; }
@@ -46,6 +44,7 @@
 
         .tab-active { border-bottom: 3px solid #3b82f6; color: white; }
         .super-gradient { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); }
+        .divine-gradient { background: linear-gradient(135deg, #ca8a04 0%, #eab308 100%); }
     </style>
 </head>
 <body class="text-white">
@@ -55,7 +54,7 @@
         <div class="bg-slate-800 p-8 rounded-3xl w-full max-w-md border border-slate-700 shadow-2xl text-center">
             <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter" id="t-login-title">Configurar Perfil</h2>
             <div class="flex justify-center mb-6">
-                <div id="avatar-preview" class="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-4xl border-4 border-slate-600 overflow-hidden">👤</div>
+                <div id="avatar-preview" class="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-4xl border-4 border-slate-600 overflow-hidden transition-all">👤</div>
             </div>
             <input type="text" id="username-input" placeholder="Seu nome..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-4 text-center outline-none">
             <input type="text" id="avatar-input" placeholder="URL da foto ou Emoji..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-center outline-none">
@@ -70,12 +69,21 @@
         </div>
     </div>
 
+    <!-- Win Modal -->
+    <div id="win-modal" class="fixed inset-0 z-[120] modal-bg flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 p-8 rounded-3xl w-full max-w-md border-4 border-yellow-500 shadow-[0_0_40px_rgba(250,204,21,0.5)] text-center">
+            <h2 class="text-4xl font-black mb-4 text-yellow-400 uppercase" id="t-win-modal-title">PARABÉNS!</h2>
+            <div class="text-6xl mb-4">🏆</div>
+            <p class="text-white mb-6 font-medium" id="t-win-modal-desc">Você atingiu 1 Sextilhão de pontos e transcendeu o universo dos Clickers. Ganhou a Borda Dourada exclusiva!</p>
+            <button onpointerdown="document.getElementById('win-modal').classList.add('hidden')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-slate-900 p-4 rounded-xl font-black uppercase transition" id="t-win-modal-btn">Continuar Jogando</button>
+        </div>
+    </div>
+
     <div class="main-container">
-        
         <!-- Sidebar -->
         <div class="w-full lg:w-72 bg-slate-900/50 p-6 border-r border-white/5 flex flex-col gap-4 lg:h-full lg:overflow-y-auto">
             <div class="flex items-center gap-4">
-                <div id="user-avatar" class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-2xl overflow-hidden shrink-0">👤</div>
+                <div id="user-avatar" class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-2xl overflow-hidden shrink-0 transition-all duration-500">👤</div>
                 <div class="overflow-hidden">
                     <p id="user-name" class="font-bold leading-none truncate">Jogador</p>
                     <p class="text-xs text-blue-400 mt-1 uppercase font-semibold" id="t-rank">Recruta</p>
@@ -95,6 +103,12 @@
                 <p id="super-mult-display" class="text-[10px] text-white/80 mt-1">Mult. Global: x1.0</p>
                 <button onpointerdown="doSuperPrestige()" id="super-prestige-btn" class="mt-3 w-full bg-white/20 hover:bg-white/40 p-2 rounded-lg text-xs font-bold transition uppercase disabled">Super Prestígio</button>
                 <p id="super-req" class="text-[9px] text-white/60 mt-2 text-center italic">Requer Mult. x50</p>
+            </div>
+
+            <div id="win-card" class="divine-gradient p-4 rounded-2xl border border-yellow-300/50 shadow-[0_0_15px_rgba(250,204,21,0.3)] hidden">
+                <p class="text-[10px] text-yellow-100 uppercase font-bold" id="t-win-label">Ascensão Divina</p>
+                <p class="text-[10px] text-white/90 mt-1 mb-2 font-medium" id="t-win-desc">Custa 1 Sextilhão (1 Sx)</p>
+                <button onpointerdown="beatGame()" id="win-btn" class="w-full bg-yellow-900/40 hover:bg-yellow-900/60 text-yellow-100 p-2 rounded-lg text-xs font-black transition uppercase disabled border border-yellow-400/30">Zerar Jogo</button>
             </div>
 
             <div class="mt-auto space-y-2">
@@ -119,7 +133,7 @@
             
             <div class="mt-8 flex gap-8 text-center text-slate-500 pointer-events-none">
                 <div><p class="text-xs uppercase font-bold" id="t-stat-clickers">Clickers</p><p id="stat-count" class="text-xl font-bold text-slate-300">0</p></div>
-                <div><p class="text-xs uppercase font-bold" id="t-stat-power">Força</p><p id="stat-power" class="text-xl font-bold text-slate-300">1</p></div>
+                <div><p class="text-xs uppercase font-bold" id="t-stat-power">Força Base</p><p id="stat-power" class="text-xl font-bold text-slate-300">1</p></div>
             </div>
         </div>
 
@@ -145,7 +159,7 @@
             </div>
             <div class="flex gap-4">
                 <button onpointerdown="closePrestigeModal()" class="flex-1 bg-slate-700 p-4 rounded-xl font-bold" id="t-cancel">Cancelar</button>
-                <button id="confirm-prestige-btn" onpointerdown="doPrestige()" class="flex-1 bg-blue-600 p-4 rounded-xl font-bold disabled" id="t-confirm">Confirmar</button>
+                <button id="confirm-prestige-btn" onpointerdown="doPrestige()" class="flex-1 bg-blue-600 p-4 rounded-xl font-bold" id="t-confirm">Confirmar</button>
             </div>
         </div>
     </div>
@@ -156,16 +170,25 @@
                 loginTitle: "Configurar Perfil", startBtn: "Começar Jogo", rank: "Recruta", 
                 prestigeLabel: "Prestígio Normal", prestigeBtn: "Prestigiar", superLabel: "Prestígio Total",
                 editProfile: "Editar Perfil", resetBtn: "Resetar Tudo", unit: "PONTOS / SEG",
-                statClickers: "Clickers", statPower: "Força", presTitle: "Ascensão",
+                statClickers: "Clickers", statPower: "Força Base", presTitle: "Ascensão",
                 presDesc: "Reseta pontos e clickers por um bônus PERMANENTE.", presCurr: "Atual",
                 presNew: "Novo", cancel: "Cancelar", confirm: "Confirmar",
+                winLabel: "Ascensão Divina", winDesc: "Custa 1 Sextilhão (1 Sx)", winModalTitle: "PARABÉNS!", 
+                winModalDesc: "Você atingiu 1 Sextilhão de pontos e transcendeu o universo dos Clickers. Ganhou a Borda Dourada exclusiva!", winModalBtn: "Continuar Jogando",
+                winBtn: "ZERAR JOGO", winBtnDone: "ZERADO!", superReqReady: "PRONTO!", superReqNotReady: "Requer Mult. x50",
+                bonusLabel: "Bônus: x", globalMultLabel: "Mult. Global: x", resetConfirm: "Deseja resetar todo o seu progresso? Se você tiver zerado, perderá a borda!",
+                namePlaceholder: "Seu nome...", avatarPlaceholder: "URL da foto ou Emoji...",
+                criticalText: "CRÍTICO!",
                 upgrades: {
                     normal: [
                         ["Overclock", "Aumenta a força dos clickers."], ["Sincronia Lunar", "Cliques manuais rendem mais."],
                         ["Fábrica", "Gera clickers automaticamente."], ["Chip de Silício", "Bônus de produção +10%."],
                         ["Crítico Quântico", "Chance de cliques 10x."], ["Energia Solar", "Produção passiva leve."],
                         ["Nanotecnologia", "Clickers 20% mais baratos."], ["IA Avançada", "Auto-clicker inteligente."],
-                        ["Portal de Dados", "Multiplica produção global."], ["Matriz Infinita", "Clickers geram clickers."]
+                        ["Portal de Dados", "Multiplica produção global."], ["Matriz Infinita", "Clickers geram clickers."],
+                        ["Acelerador de Partículas", "Multiplica o PPS por 2x!"], ["Ratos Cibernéticos", "Fábrica pesada de clickers/seg."],
+                        ["Torre de Controle", "Incríveis +1000 Força Base."], ["Buraco Negro", "Multiplica TUDO por 5x!"],
+                        ["O Grande Botão", "Cliques manuais dão +1% do PPS."]
                     ],
                     elite: [
                         ["Mina de Antimatéria", "Gera MUITOS clickers/seg."], ["Satélite de Comando", "Multiplica força base por 5."],
@@ -183,16 +206,25 @@
                 loginTitle: "Setup Profile", startBtn: "Start Game", rank: "Recruit", 
                 prestigeLabel: "Normal Prestige", prestigeBtn: "Prestige", superLabel: "Total Prestige",
                 editProfile: "Edit Profile", resetBtn: "Reset All", unit: "POINTS / SEC",
-                statClickers: "Clickers", statPower: "Power", presTitle: "Ascension",
+                statClickers: "Clickers", statPower: "Base Power", presTitle: "Ascension",
                 presDesc: "Reset points and clickers for a PERMANENT bonus.", presCurr: "Current",
                 presNew: "New", cancel: "Cancel", confirm: "Confirm",
+                winLabel: "Divine Ascension", winDesc: "Costs 1 Sextillion (1 Sx)", winModalTitle: "CONGRATULATIONS!", 
+                winModalDesc: "You reached 1 Sextillion points and transcended the universe. Earned the exclusive Golden Border!", winModalBtn: "Keep Playing",
+                winBtn: "BEAT GAME", winBtnDone: "BEATEN!", superReqReady: "READY!", superReqNotReady: "Requires x50 Mult",
+                bonusLabel: "Bonus: x", globalMultLabel: "Global Mult: x", resetConfirm: "Do you want to reset? You will lose the border!",
+                namePlaceholder: "Your name...", avatarPlaceholder: "Photo URL or Emoji...",
+                criticalText: "CRITICAL!",
                 upgrades: {
                     normal: [
                         ["Overclock", "Increase clicker strength."], ["Moon Sync", "Manual clicks yield more."],
                         ["Factory", "Auto-generate clickers."], ["Silicon Chip", "Production bonus +10%."],
                         ["Quantum Crit", "Chance for 10x clicks."], ["Solar Energy", "Passive production."],
                         ["Nanotech", "Clickers 20% cheaper."], ["Advanced AI", "Smart auto-clicker."],
-                        ["Data Portal", "Multiplies global production."], ["Infinite Matrix", "Clickers generate clickers."]
+                        ["Data Portal", "Multiplies global production."], ["Infinite Matrix", "Clickers generate clickers."],
+                        ["Particle Accelerator", "Multiplies PPS by 2x!"], ["Cyber Mice", "Heavy clicker/sec factory."],
+                        ["Control Tower", "Massive +1000 Base Power."], ["Black Hole", "Multiplies EVERYTHING by 5x!"],
+                        ["The Big Button", "Manual clicks give +1% of PPS."]
                     ],
                     elite: [
                         ["Antimatter Mine", "Huge clicker generation."], ["Command Satellite", "5x base strength."],
@@ -209,27 +241,36 @@
             es: {
                 loginTitle: "Configurar Perfil", startBtn: "Empezar", rank: "Recluta", 
                 prestigeLabel: "Prestigio Normal", prestigeBtn: "Prestigio", superLabel: "Prestigio Total",
-                editProfile: "Editar Perfil", resetBtn: "Reiniciar Todo", unit: "PONTOS / SEG",
-                statClickers: "Clickers", statPower: "Fuerza", presTitle: "Ascensión",
-                presDesc: "Reinicia puntos y clickers por un bono PERMANENTE.", presCurr: "Actual",
+                editProfile: "Editar Perfil", resetBtn: "Reiniciar Todo", unit: "PUNTOS / SEG",
+                statClickers: "Clickers", statPower: "Fuerza Base", presTitle: "Ascensión",
+                presDesc: "Reinicia para un bono PERMANENTE.", presCurr: "Actual",
                 presNew: "Nuevo", cancel: "Cancelar", confirm: "Confirmar",
+                winLabel: "Ascensión Divina", winDesc: "Cuesta 1 Sextillón (1 Sx)", winModalTitle: "¡FELICIDADES!", 
+                winModalDesc: "Alcanzaste 1 Sextillón de puntos. ¡Ganaste el Borde Dorado!", winModalBtn: "Seguir Jugando",
+                winBtn: "TERMINAR JUEGO", winBtnDone: "¡COMPLETADO!", superReqReady: "¡LISTO!", superReqNotReady: "Requiere Mult. x50",
+                bonusLabel: "Bono: x", globalMultLabel: "Mult. Global: x", resetConfirm: "¿Deseas reiniciar? ¡Perderás el borde!",
+                namePlaceholder: "Tu nombre...", avatarPlaceholder: "URL o Emoji...",
+                criticalText: "¡CRÍTICO!",
                 upgrades: {
                     normal: [
-                        ["Overclock", "Mejora fuerza de clickers."], ["Sincronía Lunar", "Clicks rinden más."],
-                        ["Fábrica", "Genera clickers auto."], ["Chip de Silicio", "Bono producción +10%."],
+                        ["Overclock", "Mejora fuerza."], ["Sincronía Lunar", "Clicks rinden más."],
+                        ["Fábrica", "Genera clickers."], ["Chip de Silicio", "Bono +10%."],
                         ["Crítico Cuántico", "Probabilidad 10x."], ["Energía Solar", "Producción pasiva."],
-                        ["Nanotecnología", "Clickers 20% baratos."], ["IA Avanzada", "Auto-clicker."],
-                        ["Portal de Datos", "Multiplica global."], ["Matriz Infinita", "Clickers generan clickers."]
+                        ["Nanotecnología", "20% baratos."], ["IA Avanzada", "Auto-clicker."],
+                        ["Portal de Datos", "Multiplica global."], ["Matriz Infinita", "Clickers generadores."],
+                        ["Acelerador de Partículas", "PPS x2!"], ["Ratones Cibernéticos", "Fábrica pesada."],
+                        ["Torre de Control", "+1000 Fuerza Base."], ["Agujero Negro", "¡TODO x5!"],
+                        ["El Gran Botón", "Clicks dan +1% del PPS."]
                     ],
                     elite: [
-                        ["Mina Antimateria", "Muchos clickers/seg."], ["Satélite Comando", "Fuerza base x5."],
-                        ["Salto Espacial", "Reduce tiempos globales."], ["Cerebro Galáctico", "Bono prestigio +50%."],
-                        ["Singularidad", "Producción exponencial."]
+                        ["Mina Antimateria", "Muchos clickers."], ["Satélite Comando", "Fuerza base x5."],
+                        ["Salto Espacial", "Reduce tiempos."], ["Cerebro Galáctico", "Bono prestigio +50%."],
+                        ["Singularidade", "Producción exponencial."]
                     ],
                     super: [
                         ["Núcleo Eterno", "Producción permanente."], ["ADN Ancestral", "Fuerza inmutable."],
-                        ["Protocolo Omega", "Clickers inmortales."], ["Voz del Vacío", "Mult. Super Prestigio +10%."],
-                        ["Dios de la Máquina", "Cúspide evolutiva."]
+                        ["Protocolo Omega", "Clickers inmortales."], ["Voz del Vacío", "Super Prestigio +10%."],
+                        ["Dios de la Máquina", "Cúspide."]
                     ]
                 }
             }
@@ -240,7 +281,10 @@
                 { base: 50, mult: 1.5 }, { base: 250, mult: 2.1 }, { base: 1000, mult: 1.6 },
                 { base: 5000, mult: 1.8 }, { base: 20000, mult: 2.5 }, { base: 100000, mult: 3.0 },
                 { base: 500000, mult: 1.4 }, { base: 2000000, mult: 2.0 }, { base: 10000000, mult: 5.0 },
-                { base: 50000000, mult: 10.0 }
+                { base: 50000000, mult: 10.0 }, 
+                { base: 500000000, mult: 5.0 }, { base: 5000000000, mult: 4.0 },
+                { base: 100000000000, mult: 6.0 }, { base: 5000000000000, mult: 10.0 },
+                { base: 100000000000000, mult: 15.0 }
             ],
             elite: [
                 { base: 1e9, mult: 2.5 }, { base: 1e10, mult: 3.0 }, { base: 1e11, mult: 4.0 },
@@ -256,10 +300,11 @@
             username: "Jogador", avatar: "👤", lang: "pt",
             score: 0, totalClickers: 0, prestige: 0, prestigeMultiplier: 1.0,
             superPrestige: 0, superMultiplier: 1.0,
-            upgrades: new Array(10).fill(0),
+            upgrades: new Array(15).fill(0),
             eliteUpgrades: new Array(5).fill(0),
             superUpgrades: new Array(5).fill(0),
-            activeTab: 'normal', lastTick: Date.now()
+            activeTab: 'normal', lastTick: Date.now(),
+            gameBeaten: false
         };
 
         function setLang(l) {
@@ -279,13 +324,18 @@
                 't-edit-profile': 'editProfile', 't-reset-btn': 'resetBtn', 't-unit': 'unit',
                 't-stat-clickers': 'statClickers', 't-stat-power': 'statPower', 't-pres-title': 'presTitle',
                 't-pres-desc': 'presDesc', 't-pres-curr': 'presCurr', 't-pres-new': 'presNew',
-                't-cancel': 'cancel', 't-confirm': 'confirm'
+                't-cancel': 'cancel', 't-confirm': 'confirm',
+                't-win-label': 'winLabel', 't-win-desc': 'winDesc', 't-win-modal-title': 'winModalTitle',
+                't-win-modal-desc': 'winModalDesc', 't-win-modal-btn': 'winModalBtn'
             };
             for(let id in map) {
                 const el = document.getElementById(id);
                 if(el) el.innerText = t[map[id]];
             }
+            document.getElementById('username-input').placeholder = t.namePlaceholder;
+            document.getElementById('avatar-input').placeholder = t.avatarPlaceholder;
             renderUpgrades();
+            updateUI();
         }
 
         function saveProfile() {
@@ -293,18 +343,12 @@
             const avatar = document.getElementById('avatar-input').value;
             if(name) state.username = name;
             if(avatar) state.avatar = avatar;
-            
             document.getElementById('user-name').innerText = state.username;
             const avDiv = document.getElementById('user-avatar');
-            
             const renderAvatar = (div, val) => {
-                if(val.startsWith('http')) {
-                    div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`;
-                } else {
-                    div.innerText = val || "👤";
-                }
+                if(val.startsWith('http')) { div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`; }
+                else { div.innerText = val || "👤"; }
             };
-
             renderAvatar(avDiv, state.avatar);
             document.getElementById('login-modal').classList.add('hidden');
             saveGame();
@@ -319,12 +363,10 @@
             renderUpgrades();
         }
 
-        // renderUpgrades agora cria o HTML base (chamado na inicialização, ao comprar e trocar de aba)
         function renderUpgrades() {
             const container = document.getElementById('upgrades-container');
             container.innerHTML = '';
             const t = i18n[state.lang].upgrades;
-
             if(state.activeTab === 'normal') {
                 renderSection("Melhorias", upgradeData.normal, state.upgrades, t.normal, 'n');
             } else {
@@ -341,28 +383,15 @@
             container.appendChild(h);
 
             data.forEach((item, i) => {
-                const cost = Math.floor(item.base * Math.pow(item.mult, levels[i]));
+                const cost = Math.floor(item.base * Math.pow(item.mult, levels[i] || 0));
                 const card = document.createElement('div');
                 const canAfford = state.score >= cost;
                 
-                // Setamos a classe base e o atributo data-cost para atualizar via updateUI() dinamicamente sem recriar DOM
-                if(isSuper) {
-                    card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 bg-purple-900/10 border-purple-500/20 shadow-sm hover:border-purple-500/50 ${!canAfford ? 'disabled' : ''}`;
-                } else {
-                    card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 bg-slate-800/50 border-white/5 shadow-sm hover:border-blue-500/50 ${!canAfford ? 'disabled' : ''}`;
-                }
+                if(isSuper) { card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 bg-purple-900/10 border-purple-500/20 shadow-sm hover:border-purple-500/50 ${!canAfford ? 'disabled' : ''}`; }
+                else { card.className = `upgrade-card p-4 rounded-xl border flex justify-between items-center mb-2 bg-slate-800/50 border-white/5 shadow-sm hover:border-blue-500/50 ${!canAfford ? 'disabled' : ''}`; }
                 card.setAttribute('data-cost', cost);
                 
-                card.innerHTML = `
-                    <div class="flex-1 pr-2">
-                        <p class="font-bold ${isSuper ? 'text-purple-300' : 'text-blue-400'} text-sm">${texts[i][0]}</p>
-                        <p class="text-[10px] text-slate-400 leading-tight">${texts[i][1]}</p>
-                        <p class="text-[10px] mt-1 font-mono text-blue-500">Lvl ${levels[i]}</p>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <p class="font-black text-sm text-white">${formatNum(cost)}</p>
-                    </div>
-                `;
+                card.innerHTML = `<div class="flex-1 pr-2"><p class="font-bold ${isSuper ? 'text-purple-300' : 'text-blue-400'} text-sm">${texts[i][0]}</p><p class="text-[10px] text-slate-400 leading-tight">${texts[i][1]}</p><p class="text-[10px] mt-1 font-mono text-blue-500">Lvl ${levels[i] || 0}</p></div><div class="text-right shrink-0"><p class="font-black text-sm text-white">${formatNum(cost)}</p></div>`;
                 
                 card.onpointerdown = (e) => {
                     e.stopPropagation();
@@ -381,12 +410,14 @@
             if(type === 'n') state.upgrades[i]++;
             else if(type === 'e') state.eliteUpgrades[i]++;
             else if(type === 's') state.superUpgrades[i]++;
-            renderUpgrades(); // Re-renderiza para atualizar custo e nível após a compra
+            renderUpgrades(); 
             updateUI();
             saveGame();
         }
 
         function formatNum(n) {
+            if (n >= 1e21) return (n/1e21).toFixed(2) + 'Sx';
+            if (n >= 1e18) return (n/1e18).toFixed(2) + 'Qi';
             if (n >= 1e15) return (n/1e15).toFixed(2) + 'Q';
             if (n >= 1e12) return (n/1e12).toFixed(2) + 'T';
             if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
@@ -396,47 +427,60 @@
         }
 
         function calculatePPS() {
-            let basePower = 1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5);
+            let basePower = 1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5) + (state.upgrades[12] * 1000);
             let pps = (state.totalClickers * basePower);
             pps *= (1 + (state.upgrades[3] * 0.1));
             pps *= (1 + (state.eliteUpgrades[4] * 2)); 
+            if(state.upgrades[10] > 0) pps *= Math.pow(2, state.upgrades[10]);
+            if(state.upgrades[13] > 0) pps *= Math.pow(5, state.upgrades[13]);
             return pps * state.prestigeMultiplier * state.superMultiplier;
         }
 
-        // updateUI não recria mais a DOM dos cards. Apenas atualiza a classe para performance.
         function updateUI() {
+            const t = i18n[state.lang];
             const pps = calculatePPS();
             document.getElementById('score-display').innerText = formatNum(state.score);
             document.getElementById('pps-display').innerText = formatNum(pps);
             document.getElementById('stat-count').innerText = formatNum(state.totalClickers);
-            document.getElementById('stat-power').innerText = formatNum(1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5));
+            const currentBasePower = 1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5) + (state.upgrades[12] * 1000);
+            document.getElementById('stat-power').innerText = formatNum(currentBasePower);
             document.getElementById('prestige-val').innerText = state.prestige;
-            document.getElementById('prestige-mult-display').innerText = `Bônus: x${state.prestigeMultiplier.toFixed(1)}`;
+            document.getElementById('prestige-mult-display').innerText = `${t.bonusLabel}${state.prestigeMultiplier.toFixed(1)}`;
             document.getElementById('super-prestige-val').innerText = state.superPrestige;
-            document.getElementById('super-mult-display').innerText = `Mult. Global: x${state.superMultiplier.toFixed(1)}`;
-
+            document.getElementById('super-mult-display').innerText = `${t.globalMultLabel}${state.superMultiplier.toFixed(1)}`;
             const sBtn = document.getElementById('super-prestige-btn');
             if(state.prestigeMultiplier >= 50) {
                 sBtn.classList.remove('disabled', 'opacity-50');
-                document.getElementById('super-req').innerText = "PRONTO!";
+                document.getElementById('super-req').innerText = t.superReqReady;
             } else {
                 sBtn.classList.add('disabled', 'opacity-50');
-                document.getElementById('super-req').innerText = "Requer Mult. x50";
+                document.getElementById('super-req').innerText = t.superReqNotReady;
             }
-
-            if(state.prestige > 0 || state.superPrestige > 0) {
-                document.getElementById('tab-elite').classList.remove('hidden');
-            }
-
-            // Atualiza o estado de "poder comprar" nos cards que já estão renderizados
+            if(state.prestige > 0 || state.superPrestige > 0) { document.getElementById('tab-elite').classList.remove('hidden'); }
+            const winCard = document.getElementById('win-card');
+            const winBtn = document.getElementById('win-btn');
+            if (state.superPrestige > 0 || state.gameBeaten || state.score >= 1e15) { winCard.classList.remove('hidden'); }
+            if (state.gameBeaten) { winBtn.innerText = t.winBtnDone; winBtn.classList.add('disabled', 'opacity-50'); }
+            else if (state.score >= 1e21) { winBtn.innerText = t.winBtn; winBtn.classList.remove('disabled', 'opacity-50'); }
+            else { winBtn.innerText = t.winBtn; winBtn.classList.add('disabled', 'opacity-50'); }
+            const avDiv = document.getElementById('user-avatar');
+            if(state.gameBeaten) { avDiv.classList.add('ring-4', 'ring-yellow-400', 'shadow-[0_0_15px_rgba(250,204,21,0.8)]'); }
+            else { avDiv.classList.remove('ring-4', 'ring-yellow-400', 'shadow-[0_0_15px_rgba(250,204,21,0.8)]'); }
             document.querySelectorAll('.upgrade-card').forEach(card => {
                 const cost = parseFloat(card.getAttribute('data-cost'));
-                if(state.score >= cost) {
-                    card.classList.remove('disabled');
-                } else {
-                    card.classList.add('disabled');
-                }
+                if(state.score >= cost) { card.classList.remove('disabled'); }
+                else { card.classList.add('disabled'); }
             });
+        }
+
+        function beatGame() {
+            if(state.score >= 1e21 && !state.gameBeaten) {
+                state.score -= 1e21;
+                state.gameBeaten = true;
+                document.getElementById('win-modal').classList.remove('hidden');
+                updateUI();
+                saveGame();
+            }
         }
 
         function openPrestigeModal() {
@@ -455,12 +499,9 @@
             state.prestigeMultiplier += (state.score / 1000000);
             state.prestige++;
             state.score = 0; state.totalClickers = 0;
-            state.upgrades = new Array(10).fill(0);
+            state.upgrades = new Array(15).fill(0);
             state.eliteUpgrades = new Array(5).fill(0);
-            closePrestigeModal();
-            renderUpgrades();
-            updateUI();
-            saveGame();
+            closePrestigeModal(); renderUpgrades(); updateUI(); saveGame();
         }
 
         function doSuperPrestige() {
@@ -469,11 +510,9 @@
             state.superPrestige++;
             state.score = 0; state.totalClickers = 0;
             state.prestigeMultiplier = 1.0; state.prestige = 0;
-            state.upgrades = new Array(10).fill(0);
+            state.upgrades = new Array(15).fill(0);
             state.eliteUpgrades = new Array(5).fill(0);
-            renderUpgrades();
-            updateUI();
-            saveGame();
+            renderUpgrades(); updateUI(); saveGame();
         }
 
         function handleMainClick(e) {
@@ -481,12 +520,34 @@
             const btn = document.getElementById('main-clicker');
             btn.classList.add('click-active');
             
-            const gain = (1 + state.upgrades[1] + (state.superUpgrades[1] * 10)) * state.superMultiplier;
+            let gain = (1 + state.upgrades[1] + (state.superUpgrades[1] * 10)) * state.superMultiplier;
+            
+            // Lógica do Upgrade 14: O Grande Botão (+1% PPS aos cliques por nível)
+            if(state.upgrades[14] > 0) {
+                gain += calculatePPS() * 0.01 * state.upgrades[14];
+            }
+
+            // --- Lógica do CRÍTICO QUÂNTICO (Upgrade 4) ---
+            let isCrit = false;
+            if(state.upgrades[4] > 0) {
+                // 5% de chance base + 1% por nível (limite de 30% para não quebrar o jogo)
+                const critChance = Math.min(0.05 + (state.upgrades[4] * 0.01), 0.30);
+                if(Math.random() < critChance) {
+                    gain *= 10;
+                    isCrit = true;
+                }
+            }
+
             state.totalClickers += gain;
             
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
-            createParticle(x, y, `+${formatNum(gain)}`, "text-blue-400");
+            const x = e.clientX || (e.touches && e.touches[0].clientX) + 20;
+            const y = e.clientY || (e.touches && e.touches[0].clientY) + 75;
+            
+            if(isCrit) {
+                createParticle(x, y, i18n[state.lang].criticalText, "text-yellow-400 scale-150 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]");
+            } else {
+                createParticle(x, y, `+${formatNum(gain)}`, "text-blue-400");
+            }
             
             updateUI();
             setTimeout(() => btn.classList.remove('click-active'), 50);
@@ -507,29 +568,27 @@
         function loadGame() {
             const saved = localStorage.getItem('clicker_evo_v4_luis');
             if(saved) {
-                state = { ...state, ...JSON.parse(saved) };
-                // Oculta a janela de início se você já tem jogo salvo!
+                const parsed = JSON.parse(saved);
+                if(parsed.upgrades && parsed.upgrades.length < 15) {
+                    parsed.upgrades = [...parsed.upgrades, ...new Array(15 - parsed.upgrades.length).fill(0)];
+                }
+                state = { ...state, ...parsed };
                 document.getElementById('login-modal').classList.add('hidden');
             }
-            
             document.getElementById('user-name').innerText = state.username;
-            
-            // Esta função inicializa os Upgrades de vez na tela (tinha faltado puxar na ausência do save)
             setLang(state.lang);
-            
             const avDiv = document.getElementById('user-avatar');
             const renderAvatar = (div, val) => {
-                if(val && val.startsWith('http')) {
-                    div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`;
-                } else {
-                    div.innerText = val || "👤";
-                }
+                if(val && val.startsWith('http')) { div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`; }
+                else { div.innerText = val || "👤"; }
             };
             renderAvatar(avDiv, state.avatar);
+            updateUI();
         }
 
         function resetGame(full) {
-            if(confirm("Deseja resetar todo o seu progresso?")) {
+            const t = i18n[state.lang];
+            if(confirm(t.resetConfirm)) {
                 localStorage.removeItem('clicker_evo_v4_luis');
                 location.reload();
             }
@@ -539,13 +598,12 @@
             loadGame();
             const clicker = document.getElementById('main-clicker');
             clicker.onpointerdown = handleMainClick;
-            
             setInterval(() => {
                 const now = Date.now();
                 const dt = (now - state.lastTick) / 1000;
                 state.lastTick = now;
                 state.score += calculatePPS() * dt;
-                state.totalClickers += (state.upgrades[2] * 0.1 + state.eliteUpgrades[0] * 10) * dt;
+                state.totalClickers += (state.upgrades[2] * 0.1 + state.eliteUpgrades[0] * 10 + state.upgrades[11] * 10) * dt; 
                 updateUI();
             }, 100);
         };
