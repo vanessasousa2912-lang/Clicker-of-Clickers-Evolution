@@ -257,10 +257,10 @@
                         ["Fábrica", "Genera clickers."], ["Chip de Silicio", "Bono +10%."],
                         ["Crítico Cuántico", "Probabilidad 10x."], ["Energía Solar", "Producción pasiva."],
                         ["Nanotecnología", "20% baratos."], ["IA Avanzada", "Auto-clicker."],
-                        ["Portal de Datos", "Multiplica global."], ["Matriz Infinita", "Clickers generadores."],
+                        ["Portal de Dados", "Multiplica global."], ["Matriz Infinita", "Clickers generadores."],
                         ["Acelerador de Partículas", "PPS x2!"], ["Ratones Cibernéticos", "Fábrica pesada."],
                         ["Torre de Control", "+1000 Fuerza Base."], ["Agujero Negro", "¡TODO x5!"],
-                        ["El Gran Botón", "Clicks dan +1% del PPS."]
+                        ["El Gran Botão", "Clicks dan +1% del PPS."]
                     ],
                     elite: [
                         ["Mina Antimateria", "Muchos clickers."], ["Satélite Comando", "Fuerza base x5."],
@@ -346,7 +346,7 @@
             document.getElementById('user-name').innerText = state.username;
             const avDiv = document.getElementById('user-avatar');
             const renderAvatar = (div, val) => {
-                if(val.startsWith('http')) { div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`; }
+                if(val && val.startsWith('http')) { div.innerHTML = `<img src="${val}" class="w-full h-full object-cover">`; }
                 else { div.innerText = val || "👤"; }
             };
             renderAvatar(avDiv, state.avatar);
@@ -416,6 +416,7 @@
         }
 
         function formatNum(n) {
+            if (isNaN(n) || n === null) return "0";
             if (n >= 1e21) return (n/1e21).toFixed(2) + 'Sx';
             if (n >= 1e18) return (n/1e18).toFixed(2) + 'Qi';
             if (n >= 1e15) return (n/1e15).toFixed(2) + 'Q';
@@ -427,45 +428,62 @@
         }
 
         function calculatePPS() {
-            let basePower = 1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5) + (state.upgrades[12] * 1000);
+            let basePower = 1 + (state.upgrades[0] || 0) + ((state.eliteUpgrades[1] || 0) * 5) + ((state.upgrades[12] || 0) * 1000);
             let pps = (state.totalClickers * basePower);
-            pps *= (1 + (state.upgrades[3] * 0.1));
-            pps *= (1 + (state.eliteUpgrades[4] * 2)); 
+            pps *= (1 + ((state.upgrades[3] || 0) * 0.1));
+            pps *= (1 + ((state.eliteUpgrades[4] || 0) * 2)); 
             if(state.upgrades[10] > 0) pps *= Math.pow(2, state.upgrades[10]);
             if(state.upgrades[13] > 0) pps *= Math.pow(5, state.upgrades[13]);
-            return pps * state.prestigeMultiplier * state.superMultiplier;
+            
+            const pMult = (state.prestigeMultiplier || 1.0);
+            const sMult = (state.superMultiplier || 1.0);
+            return pps * pMult * sMult;
         }
 
         function updateUI() {
             const t = i18n[state.lang];
             const pps = calculatePPS();
+            
+            // GARANTIR QUE OS MULTIPLICADORES NUNCA SEJAM NULOS (FIX DO ERRO toFixed)
+            const pMult = (state.prestigeMultiplier !== undefined && state.prestigeMultiplier !== null) ? state.prestigeMultiplier : 1.0;
+            const sMult = (state.superMultiplier !== undefined && state.superMultiplier !== null) ? state.superMultiplier : 1.0;
+
             document.getElementById('score-display').innerText = formatNum(state.score);
             document.getElementById('pps-display').innerText = formatNum(pps);
             document.getElementById('stat-count').innerText = formatNum(state.totalClickers);
-            const currentBasePower = 1 + state.upgrades[0] + (state.eliteUpgrades[1] * 5) + (state.upgrades[12] * 1000);
+            
+            const currentBasePower = 1 + (state.upgrades[0] || 0) + ((state.eliteUpgrades[1] || 0) * 5) + ((state.upgrades[12] || 0) * 1000);
             document.getElementById('stat-power').innerText = formatNum(currentBasePower);
-            document.getElementById('prestige-val').innerText = state.prestige;
-            document.getElementById('prestige-mult-display').innerText = `${t.bonusLabel}${state.prestigeMultiplier.toFixed(1)}`;
-            document.getElementById('super-prestige-val').innerText = state.superPrestige;
-            document.getElementById('super-mult-display').innerText = `${t.globalMultLabel}${state.superMultiplier.toFixed(1)}`;
+            
+            document.getElementById('prestige-val').innerText = state.prestige || 0;
+            document.getElementById('prestige-mult-display').innerText = `${t.bonusLabel}${pMult.toFixed(1)}`;
+            
+            document.getElementById('super-prestige-val').innerText = state.superPrestige || 0;
+            document.getElementById('super-mult-display').innerText = `${t.globalMultLabel}${sMult.toFixed(1)}`;
+            
             const sBtn = document.getElementById('super-prestige-btn');
-            if(state.prestigeMultiplier >= 50) {
+            if(pMult >= 50) {
                 sBtn.classList.remove('disabled', 'opacity-50');
                 document.getElementById('super-req').innerText = t.superReqReady;
             } else {
                 sBtn.classList.add('disabled', 'opacity-50');
                 document.getElementById('super-req').innerText = t.superReqNotReady;
             }
+            
             if(state.prestige > 0 || state.superPrestige > 0) { document.getElementById('tab-elite').classList.remove('hidden'); }
+            
             const winCard = document.getElementById('win-card');
             const winBtn = document.getElementById('win-btn');
             if (state.superPrestige > 0 || state.gameBeaten || state.score >= 1e15) { winCard.classList.remove('hidden'); }
+            
             if (state.gameBeaten) { winBtn.innerText = t.winBtnDone; winBtn.classList.add('disabled', 'opacity-50'); }
             else if (state.score >= 1e21) { winBtn.innerText = t.winBtn; winBtn.classList.remove('disabled', 'opacity-50'); }
             else { winBtn.innerText = t.winBtn; winBtn.classList.add('disabled', 'opacity-50'); }
+            
             const avDiv = document.getElementById('user-avatar');
             if(state.gameBeaten) { avDiv.classList.add('ring-4', 'ring-yellow-400', 'shadow-[0_0_15px_rgba(250,204,21,0.8)]'); }
             else { avDiv.classList.remove('ring-4', 'ring-yellow-400', 'shadow-[0_0_15px_rgba(250,204,21,0.8)]'); }
+            
             document.querySelectorAll('.upgrade-card').forEach(card => {
                 const cost = parseFloat(card.getAttribute('data-cost'));
                 if(state.score >= cost) { card.classList.remove('disabled'); }
@@ -484,8 +502,9 @@
         }
 
         function openPrestigeModal() {
-            document.getElementById('pres-curr-val').innerText = `x${state.prestigeMultiplier.toFixed(1)}`;
-            const newMult = state.prestigeMultiplier + (state.score / 1000000);
+            const pMult = (state.prestigeMultiplier || 1.0);
+            document.getElementById('pres-curr-val').innerText = `x${pMult.toFixed(1)}`;
+            const newMult = pMult + (state.score / 1000000);
             document.getElementById('pres-new-val').innerText = `x${newMult.toFixed(1)}`;
             const canPrestige = state.score >= 1000000;
             document.getElementById('confirm-prestige-btn').classList.toggle('disabled', !canPrestige);
@@ -496,8 +515,8 @@
 
         function doPrestige() {
             if(state.score < 1000000) return;
-            state.prestigeMultiplier += (state.score / 1000000);
-            state.prestige++;
+            state.prestigeMultiplier = (state.prestigeMultiplier || 1.0) + (state.score / 1000000);
+            state.prestige = (state.prestige || 0) + 1;
             state.score = 0; state.totalClickers = 0;
             state.upgrades = new Array(15).fill(0);
             state.eliteUpgrades = new Array(5).fill(0);
@@ -505,9 +524,10 @@
         }
 
         function doSuperPrestige() {
-            if(state.prestigeMultiplier < 50) return;
-            state.superMultiplier += (state.prestigeMultiplier / 10);
-            state.superPrestige++;
+            const pMult = (state.prestigeMultiplier || 1.0);
+            if(pMult < 50) return;
+            state.superMultiplier = (state.superMultiplier || 1.0) + (pMult / 10);
+            state.superPrestige = (state.superPrestige || 0) + 1;
             state.score = 0; state.totalClickers = 0;
             state.prestigeMultiplier = 1.0; state.prestige = 0;
             state.upgrades = new Array(15).fill(0);
@@ -520,17 +540,15 @@
             const btn = document.getElementById('main-clicker');
             btn.classList.add('click-active');
             
-            let gain = (1 + state.upgrades[1] + (state.superUpgrades[1] * 10)) * state.superMultiplier;
+            const sMult = (state.superMultiplier || 1.0);
+            let gain = (1 + (state.upgrades[1] || 0) + ((state.superUpgrades[1] || 0) * 10)) * sMult;
             
-            // Lógica do Upgrade 14: O Grande Botão (+1% PPS aos cliques por nível)
             if(state.upgrades[14] > 0) {
                 gain += calculatePPS() * 0.01 * state.upgrades[14];
             }
 
-            // --- Lógica do CRÍTICO QUÂNTICO (Upgrade 4) ---
             let isCrit = false;
             if(state.upgrades[4] > 0) {
-                // 5% de chance base + 1% por nível (limite de 30% para não quebrar o jogo)
                 const critChance = Math.min(0.05 + (state.upgrades[4] * 0.01), 0.30);
                 if(Math.random() < critChance) {
                     gain *= 10;
@@ -569,9 +587,14 @@
             const saved = localStorage.getItem('clicker_evo_v4_luis');
             if(saved) {
                 const parsed = JSON.parse(saved);
+                // Migração de array de upgrades antigos ou incompletos
                 if(parsed.upgrades && parsed.upgrades.length < 15) {
                     parsed.upgrades = [...parsed.upgrades, ...new Array(15 - parsed.upgrades.length).fill(0)];
                 }
+                // Garante que multiplicadores carregados não sejam nulos
+                if (parsed.prestigeMultiplier === null || parsed.prestigeMultiplier === undefined) parsed.prestigeMultiplier = 1.0;
+                if (parsed.superMultiplier === null || parsed.superMultiplier === undefined) parsed.superMultiplier = 1.0;
+                
                 state = { ...state, ...parsed };
                 document.getElementById('login-modal').classList.add('hidden');
             }
@@ -603,7 +626,7 @@
                 const dt = (now - state.lastTick) / 1000;
                 state.lastTick = now;
                 state.score += calculatePPS() * dt;
-                state.totalClickers += (state.upgrades[2] * 0.1 + state.eliteUpgrades[0] * 10 + state.upgrades[11] * 10) * dt; 
+                state.totalClickers += ((state.upgrades[2] || 0) * 0.1 + (state.eliteUpgrades[0] || 0) * 10 + (state.upgrades[11] || 0) * 10) * dt; 
                 updateUI();
             }, 100);
         };
